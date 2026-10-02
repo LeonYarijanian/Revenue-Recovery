@@ -1,0 +1,76 @@
+{
+  "Header": {
+    "Time": "2026-10-12T03:00:12-07:00",
+    "ReportName": "ProfitAndLoss",
+    "ReportBasis": "Accrual",
+    "StartPeriod": "2026-10-05",
+    "EndPeriod": "2026-10-11",
+    "SummarizeColumnsBy": "Total",
+    "Currency": "USD",
+    "Option": [
+      {"Name": "AccountingStandard", "Value": "GAAP"},
+      {"Name": "NoReportData", "Value": "false"}
+    ]
+  },
+  "Columns": {
+    "Column": [
+      {"ColTitle": "", "ColType": "Account", "MetaData": [{"Name": "ColKey", "Value": "account"}]},
+      {"ColTitle": "Total", "ColType": "Money", "MetaData": [{"Name": "ColKey", "Value": "total"}]}
+    ]
+  },
+  "Rows": {
+    "Row": [
+      {
+        "Header": {"ColData": [{"value": "Income"}, {"value": ""}]},
+        "Rows": {
+          "Row": [
+            {"ColData": [{"value": "Services", "id": "1"}, {"value": "30500.00"}], "type": "Data"},
+            {"ColData": [{"value": "Maintenance Plans", "id": "2"}, {"value": "1500.00"}], "type": "Data"}
+          ]
+        },
+        "Summary": {"ColData": [{"value": "Total Income"}, {"value": "32000.00"}]},
+        "type": "Section",
+        "group": "Income"
+      },
+      {
+        "Header": {"ColData": [{"value": "Cost of Goods Sold"}, {"value": ""}]},
+        "Rows": {
+          "Row": [
+            {"ColData": [{"value": "Materials", "id": "60"}, {"value": "12000.00"}], "type": "Data"},
+            {"ColData": [{"value": "Subcontractors", "id": "61"}, {"value": "8000.00"}], "type": "Data"}
+          ]
+        },
+        "Summary": {"ColData": [{"value": "Total Cost of Goods Sold"}, {"value": "20000.00"}]},
+        "type": "Section",
+        "group": "COGS"
+      },
+      {
+        "Summary": {"ColData": [{"value": "Gross Profit"}, {"value": "12000.00"}]},
+        "type": "Section",
+        "group": "GrossProfit"
+      },
+      {
+        "Header": {"ColData": [{"value": "Expenses"}, {"value": ""}]},
+        "Rows": {
+          "Row": [
+            {"ColData": [{"value": "Rent or Lease", "id": "17"}, {"value": "4000.00"}], "type": "Data"},
+            {"ColData": [{"value": "Office Wages", "id": "18"}, {"value": "6000.00"}], "type": "Data"}
+          ]
+        },
+        "Summary": {"ColData": [{"value": "Total Expenses"}, {"value": "10000.00"}]},
+        "type": "Section",
+        "group": "Expenses"
+      },
+      {
+        "Summary": {"ColData": [{"value": "Net Operating Income"}, {"value": "2000.00"}]},
+        "type": "Section",
+        "group": "NetOperatingIncome"
+      },
+      {
+        "Summary": {"ColData": [{"value": "Net Income"}, {"value": "2000.00"}]},
+        "type": "Section",
+        "group": "NetIncome"
+      }
+    ]
+  }
+}

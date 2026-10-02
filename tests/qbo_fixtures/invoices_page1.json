@@ -1,0 +1,44 @@
+{
+  "QueryResponse": {
+    "Invoice": [
+      {
+        "Id": "130",
+        "SyncToken": "0",
+        "DocNumber": "1037",
+        "TxnDate": "2026-08-15",
+        "DueDate": "2026-09-14",
+        "CustomerRef": {"value": "24", "name": "Sonnenschein Family Store"},
+        "BillEmail": {"Address": "Familiystore@Intuit.com"},
+        "TotalAmt": 362.07,
+        "Balance": 362.07,
+        "CurrencyRef": {"value": "USD", "name": "United States Dollar"}
+      },
+      {
+        "Id": "131",
+        "SyncToken": "1",
+        "DocNumber": "1038",
+        "TxnDate": "2026-09-20",
+        "DueDate": "2026-10-20",
+        "CustomerRef": {"value": "8", "name": "Freeman Sporting Goods:0969 Ocean View Road"},
+        "BillEmail": {"Address": "Sporting_goods@intuit.com"},
+        "TotalAmt": 1250.00,
+        "Balance": 250.00,
+        "CurrencyRef": {"value": "USD", "name": "United States Dollar"}
+      },
+      {
+        "Id": "132",
+        "SyncToken": "0",
+        "DocNumber": "1039",
+        "TxnDate": "2026-06-01",
+        "DueDate": "2026-07-01",
+        "CustomerRef": {"value": "1", "name": "Amy's Bird Sanctuary"},
+        "TotalAmt": 4800.00,
+        "Balance": 4800.00,
+        "CurrencyRef": {"value": "USD", "name": "United States Dollar"}
+      }
+    ],
+    "startPosition": 1,
+    "maxResults": 3
+  },
+  "time": "2026-10-12T03:00:14.123-07:00"
+}
