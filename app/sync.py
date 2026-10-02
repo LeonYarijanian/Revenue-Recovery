@@ -73,8 +73,10 @@ def run_sync(db: Session, company_id: int, now: datetime, source: DataSource | N
     db.commit()
     run_id = run.id
 
+    owned_source = None
     try:
-        source = source or source_for(db, company, now)
+        if source is None:
+            source = owned_source = source_for(db, company, now)
         week_starts = last_complete_week_starts(
             local_date(now, company.timezone), FIRST_SYNC_WEEKS if first_sync else LATER_SYNC_WEEKS
         )
@@ -100,6 +102,9 @@ def run_sync(db: Session, company_id: int, now: datetime, source: DataSource | N
         run.error_text = f"{type(exc).__name__}: {exc}"[:500]
         db.commit()
         logger.warning("Sync %s failed for company %s (%s).", run_id, company_id, type(exc).__name__)
+    finally:
+        if isinstance(owned_source, QboDataSource):
+            owned_source.close()
     return run
 
 

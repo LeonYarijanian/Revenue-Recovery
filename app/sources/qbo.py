@@ -91,6 +91,9 @@ class QboDataSource(DataSource):
         self.base = qbo_oauth.API_BASE[QboEnvironment(connection.environment)]
         self._last_request: float | None = None
 
+    def close(self) -> None:
+        self.client.close()
+
     def _pace(self) -> None:
         if self._last_request is not None:
             wait = MIN_REQUEST_INTERVAL - (time.monotonic() - self._last_request)

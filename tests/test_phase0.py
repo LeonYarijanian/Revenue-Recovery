@@ -14,9 +14,9 @@ from app.crypto import decrypt, encrypt
 from app.db import get_engine, session_scope
 from app.enums import ReportStatus
 from app.models import Report
+from app.weeks import to_db
 from tests.conftest import TEST_ENV, csrf_from, login
 from tests.fixtures import ROOT, W0, R, fresh_database, local
-from app.weeks import to_db
 
 SECTION_5_TABLES = {
     "companies",

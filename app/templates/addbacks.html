@@ -15,33 +15,29 @@
 </section>
 
 {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
-<table>
-  <thead><tr><th>Category</th><th>Label</th><th>Yearly amount ($)</th><th>Note</th><th></th></tr></thead>
-  <tbody>
-  {% for a in addbacks %}
-    <tr>
-      <td colspan="5">
-        <form method="post" action="/addbacks/{{ a.id }}" class="grid">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <select name="category" aria-label="Category">
-            {% for value, label in categories.items() %}<option value="{{ value }}" {% if a.category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
-          </select>
-          <input type="text" name="label" value="{{ a.label }}" maxlength="80" aria-label="Label" required>
-          <input type="text" name="amount" value="{{ a.annual_amount_cents|plain_dollars }}" inputmode="decimal" aria-label="Yearly amount" required>
-          <input type="text" name="note" value="{{ a.note }}" maxlength="200" aria-label="Note">
-          <button type="submit" class="secondary">Save</button>
-        </form>
-        <form method="post" action="/addbacks/{{ a.id }}/delete">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <button type="submit" class="secondary outline">Delete {{ a.label }}</button>
-        </form>
-      </td>
-    </tr>
-  {% else %}
-    <tr><td colspan="5" class="muted">No add-backs yet.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
+<div class="addback-head grid">
+  <span>Category</span><span>Label</span><span>Yearly amount ($)</span><span>Note</span><span></span>
+</div>
+{% for a in addbacks %}
+<div class="addback-row">
+  <form method="post" action="/addbacks/{{ a.id }}" class="grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <select name="category" aria-label="Category">
+      {% for value, label in categories.items() %}<option value="{{ value }}" {% if a.category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <input type="text" name="label" value="{{ a.label }}" maxlength="80" aria-label="Label" required>
+    <input type="text" name="amount" value="{{ a.annual_amount_cents|plain_dollars }}" inputmode="decimal" aria-label="Yearly amount" required>
+    <input type="text" name="note" value="{{ a.note }}" maxlength="200" aria-label="Note">
+    <button type="submit" class="secondary">Save</button>
+  </form>
+  <form method="post" action="/addbacks/{{ a.id }}/delete" class="addback-delete">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="secondary outline">Delete {{ a.label }}</button>
+  </form>
+</div>
+{% else %}
+<p class="muted">No add-backs yet.</p>
+{% endfor %}
 
 <h2>Add an add-back</h2>
 <form method="post" action="/addbacks" class="grid">

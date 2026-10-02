@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}Owner KPI Report{% endblock %}</title>
+<link rel="icon" href="data:,">
+<meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[234]..","swap":true},{"code":"...","swap":false,"error":true}]}'>
 <link rel="stylesheet" href="/static/pico.min.css">
 <link rel="stylesheet" href="/static/app.css">
 <script src="/static/htmx.min.js" defer></script>
@@ -31,7 +33,7 @@
     </div>
     <nav class="topbar-links">
       <a href="/">Home</a>
-      <a href="/#reports">Reports</a>
+      <a href="/#reports" hx-boost="false">Reports</a>
       <a href="/invoices">Invoices</a>
       <a href="/reminders">Reminders</a>
       <a href="/addbacks">Add-backs</a>

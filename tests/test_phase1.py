@@ -12,7 +12,7 @@ from app.kpis import NOT_MEANINGFUL, compute_kpis, display
 from app.models import Addback, Invoice, WeeklyFinancial
 from app.money import NO_DATA, fmt_dollars, q1, round_cents
 from app.weeks import report_week_start, week_label, week_start_n
-from tests.fixtures import R, W0
+from tests.fixtures import W0, R
 
 
 def kpis(base):

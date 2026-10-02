@@ -28,9 +28,9 @@ TEST_ENV = {
 # The app module builds an app at import time, so valid settings must exist first.
 os.environ.update(TEST_ENV)
 
+from app import mailer  # noqa: E402
 from app.config import get_settings  # noqa: E402
 from app.sources import qbo, qbo_oauth  # noqa: E402
-from app import mailer  # noqa: E402
 from tests.fixtures import build_base_fixture  # noqa: E402
 
 

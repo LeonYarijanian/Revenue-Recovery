@@ -4,7 +4,7 @@ import argparse
 import sys
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 
 from app.auth import hash_password
@@ -30,6 +30,9 @@ DEMO_ADDBACKS = [
 
 
 def seed_demo(db: Session, now: datetime) -> int:
+    if not inspect(db.get_bind()).has_table(Company.__tablename__):
+        print("The database has no tables yet. Run: alembic upgrade head")
+        return 1
     if db.scalar(select(Company.id).where(Company.name == DEMO_COMPANY_NAME)) is not None:
         print("Demo company already exists.")
         return 1
