@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Reminders{% endblock %}
+{% block content %}
+<h1>Payment reminders</h1>
+<p class="muted">Nothing goes to a customer until you approve it. Approved reminders go out Monday to Friday, 09:00 to 17:00, at most once a week per invoice.</p>
+<div class="actions">
+  <form method="post" action="/reminders/draft"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary">Draft reminders now</button></form>
+  {% if drafts %}
+  <form method="post" action="/reminders/approve-all"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Approve all</button></form>
+  {% endif %}
+</div>
+
+<h2>Drafts ({{ drafts|length }})</h2>
+{% for row in drafts %}
+  {% set r = row.reminder %}{% set inv = row.invoice %}{% set edit = edits.get(r.id, {}) %}
+  <article class="reminder-card" id="reminder-{{ r.id }}">
+    <header>
+      <strong>{{ inv.customer_name }}</strong> · invoice {{ inv.doc_number }} · {{ inv.balance_cents|dollars_cents }}
+      · {{ row.days }} days past due · level {{ r.template_level }} · reminder {{ r.sequence_number }}
+    </header>
+    {% if errors.get(r.id) %}<p class="error" role="alert">{{ errors[r.id] }}</p>{% endif %}
+    <form method="post" action="/reminders/{{ r.id }}/approve">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>To <input type="email" name="to_email" value="{{ edit.get('to_email', r.to_email) }}" required></label>
+      <label>Subject <input type="text" name="subject" value="{{ edit.get('subject', r.subject) }}" required maxlength="200"></label>
+      <label>Body <textarea name="body" required>{{ edit.get('body', r.body) }}</textarea></label>
+      <button type="submit">Approve and send</button>
+    </form>
+    <footer class="actions">
+      <form method="post" action="/reminders/{{ r.id }}/skip"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary outline">Skip</button></form>
+      <form method="post" action="/reminders/{{ r.id }}/dispute"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary outline">Mark invoice disputed</button></form>
+    </footer>
+  </article>
+{% else %}
+  <p class="muted">No drafts to review.</p>
+{% endfor %}
+
+{% if waiting %}
+<h2>Approved, waiting to send ({{ waiting|length }})</h2>
+<table>
+  <thead><tr><th>Customer</th><th>Invoice</th><th>To</th><th>Approved</th><th>Note</th></tr></thead>
+  <tbody>
+  {% for row in waiting %}
+    <tr><td>{{ row.invoice.customer_name }}</td><td>{{ row.invoice.doc_number }}</td><td>{{ row.reminder.to_email }}</td>
+      <td>{{ fmt_local(row.reminder.approved_at, company.timezone) }}</td><td>{{ row.reminder.error_text or '' }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if recent %}
+<h2>Recent</h2>
+<table>
+  <thead><tr><th>Customer</th><th>Invoice</th><th>Status</th><th>Sent</th><th>Note</th></tr></thead>
+  <tbody>
+  {% for row in recent %}
+    <tr><td>{{ row.invoice.customer_name }}</td><td>{{ row.invoice.doc_number }}</td><td>{{ row.reminder.status }}</td>
+      <td>{{ fmt_local(row.reminder.sent_at, company.timezone) }}</td><td>{{ row.reminder.error_text or '' }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block content %}
+<h1>Account</h1>
+<p>{{ user.full_name }} · {{ user.email }} · {{ user.role }}</p>
+{% if user.must_change_password %}<p class="error">Choose a new password before you continue.</p>{% endif %}
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if message %}<p class="flash" role="status">{{ message }}</p>{% endif %}
+<form method="post" action="/account" class="narrow">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label>Current password <input type="password" name="current_password" autocomplete="current-password" required></label>
+  <label>New password (at least 12 characters) <input type="password" name="new_password" autocomplete="new-password" minlength="12" required></label>
+  <label>Confirm new password <input type="password" name="confirm_password" autocomplete="new-password" minlength="12" required></label>
+  <button type="submit">Change password</button>
+</form>
+{% if company and company.source_type == 'QBO' and not user.must_change_password %}
+<h2>QuickBooks</h2>
+<p>Status: {{ connection.status if connection else 'NOT_CONNECTED' }}</p>
+<div class="actions">
+  <a role="button" href="/qbo/connect?company_id={{ company.id }}" hx-boost="false">Connect QuickBooks</a>
+  {% if connection and connection.status != 'DISCONNECTED' %}
+  <form method="post" action="/qbo/disconnect">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="company_id" value="{{ company.id }}">
+    <button type="submit" class="secondary outline">Disconnect</button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

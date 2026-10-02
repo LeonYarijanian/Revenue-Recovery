@@ -1,0 +1,204 @@
+:root {
+  --pico-font-size: 100%;
+}
+
+body {
+  background: #f6f6f4;
+}
+
+main.container {
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+.topbar {
+  background: #ffffff;
+  border-bottom: 1px solid #dcdcd8;
+}
+
+.topbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.4rem;
+}
+
+.topbar-company {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topbar-company select {
+  margin: 0;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  min-width: 14rem;
+}
+
+.switcher {
+  margin: 0;
+}
+
+.topbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  font-size: 0.95rem;
+}
+
+.topbar-links form.inline {
+  margin: 0;
+}
+
+.counter {
+  font-size: 0.85rem;
+  padding-bottom: 0.4rem;
+}
+
+button.linkish {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--pico-primary);
+  font-size: 0.95rem;
+  width: auto;
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+}
+
+.badge-demo {
+  background: #7a7a76;
+}
+
+.badge-live {
+  background: #c62828;
+}
+
+.flash {
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.3rem;
+  background: #e7f3ec;
+  border: 1px solid #9fcdb2;
+}
+
+.error {
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.3rem;
+  background: #fdecea;
+  border: 1px solid #f1a9a0;
+  color: #8a1c12;
+}
+
+.muted {
+  color: #6e7781;
+}
+
+tr.red td {
+  background: #fdecea;
+}
+
+.report-frame {
+  width: 100%;
+  min-height: 900px;
+  border: 1px solid #dcdcd8;
+  border-radius: 0.3rem;
+  background: #ffffff;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  border-bottom: 1px solid #dcdcd8;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+}
+
+.tabs a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.actions form {
+  margin: 0;
+}
+
+.actions button,
+.actions a[role="button"] {
+  width: auto;
+  margin: 0;
+}
+
+.reminder-card textarea {
+  min-height: 12rem;
+  font-family: var(--pico-font-family-monospace);
+  font-size: 0.85rem;
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.figures div {
+  background: #ffffff;
+  border: 1px solid #dcdcd8;
+  border-radius: 0.3rem;
+  padding: 0.6rem 0.8rem;
+}
+
+.figures span {
+  display: block;
+  font-size: 0.8rem;
+  color: #6e7781;
+}
+
+.figures strong {
+  font-size: 1.2rem;
+}
+
+.value-panel {
+  background: #ffffff;
+  border: 1px solid #dcdcd8;
+  border-radius: 0.3rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.narrow {
+  max-width: 28rem;
+}
+
+td form {
+  margin: 0;
+}
+
+td button {
+  width: auto;
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}

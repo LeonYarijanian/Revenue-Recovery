@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Payment reminders{% endblock %}
+{% block content %}
+<article class="narrow">
+  {% if done %}
+  <p>You won't get more payment reminders by email from {{ company_name }}.</p>
+  {% else %}
+  <h1>Stop payment reminders</h1>
+  <p>Stop payment reminder emails from {{ company_name }}?</p>
+  <form method="post" action="/r/{{ token }}" hx-boost="false">
+    <button type="submit">Confirm</button>
+  </form>
+  {% endif %}
+</article>
+{% endblock %}

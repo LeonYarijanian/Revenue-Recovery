@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block content %}
+<h1>Open invoices</h1>
+{% if rows %}
+<figure>
+<table>
+  <thead><tr><th>Customer</th><th>Invoice</th><th>Due date</th><th>Balance</th><th>Days past due</th><th>Bucket</th><th></th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    {% set inv = row.invoice %}
+    <tr>
+      <td>{{ inv.customer_name }}{% if inv.is_disputed %} <small class="muted">(disputed)</small>{% endif %}</td>
+      <td>{{ inv.doc_number }}</td>
+      <td>{{ inv.due_date|date }}</td>
+      <td>{{ inv.balance_cents|dollars_cents }}</td>
+      <td>{{ row.days }}</td>
+      <td>{{ row.bucket }}</td>
+      <td>
+        {% if inv.is_disputed %}
+        <form method="post" action="/invoices/{{ inv.id }}/undispute"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary">Unmark</button></form>
+        {% else %}
+        <form method="post" action="/invoices/{{ inv.id }}/dispute"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary outline">Mark disputed</button></form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</figure>
+{% else %}<p>No open invoices.</p>{% endif %}
+{% endblock %}

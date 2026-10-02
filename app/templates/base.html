@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Owner KPI Report{% endblock %}</title>
+<link rel="stylesheet" href="/static/pico.min.css">
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/htmx.min.js" defer></script>
+</head>
+<body hx-boost="true" hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+{% if user %}
+<header class="topbar">
+  <div class="container topbar-row">
+    <div class="topbar-company">
+      {% if is_operator %}
+      <form method="post" action="/switch-company" class="switcher">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <select name="company_id" aria-label="Company" onchange="this.form.requestSubmit()">
+          {% for c in companies %}
+          <option value="{{ c.id }}" {% if company and c.id == company.id %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+          {% if not companies %}<option>No companies yet</option>{% endif %}
+        </select>
+        <noscript><button type="submit">Switch</button></noscript>
+      </form>
+      {% elif company %}
+      <strong>{{ company.name }}</strong>
+      {% endif %}
+      <span class="badge {{ 'badge-live' if send_mode == 'LIVE' else 'badge-demo' }}">{{ send_mode }}</span>
+    </div>
+    <nav class="topbar-links">
+      <a href="/">Home</a>
+      <a href="/#reports">Reports</a>
+      <a href="/invoices">Invoices</a>
+      <a href="/reminders">Reminders</a>
+      <a href="/addbacks">Add-backs</a>
+      {% if is_operator %}
+      <a href="/operator">Operator console</a>
+      {% if company %}<a href="/companies/{{ company.id }}?tab=settings">Settings</a>{% endif %}
+      {% endif %}
+      <a href="/account">Account</a>
+      <form method="post" action="/logout" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="linkish">Log out</button>
+      </form>
+    </nav>
+  </div>
+  <div class="container counter"><a href="/reminders">Reminders to review: {{ drafts_count }}</a></div>
+</header>
+{% endif %}
+<main class="container">
+  {% if flash %}<p class="flash" role="status">{{ flash }}</p>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

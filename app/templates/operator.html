@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Operator console{% endblock %}
+{% block content %}
+<div class="actions" style="justify-content: space-between;">
+  <h1>Operator console</h1>
+  <a role="button" href="/companies/new">New company</a>
+</div>
+<figure>
+<table>
+  <thead>
+    <tr><th>Company</th><th>Source</th><th>Connection</th><th>Last sync</th><th>Last report</th><th>Issues</th><th>Drafts waiting</th></tr>
+  </thead>
+  <tbody>
+  {% for row in rows %}
+    {% set c = row.company %}
+    <tr class="{{ 'red' if row.red else '' }}">
+      <td><a href="/companies/{{ c.id }}">{{ c.name }}</a></td>
+      <td>{{ c.source_type }}{% if row.environment %} · {{ row.environment }}{% endif %}</td>
+      <td>{{ row.connection_status if c.source_type == 'QBO' else '—' }}</td>
+      <td>
+        {% if row.last_sync %}{{ fmt_local(row.last_sync.finished_at or row.last_sync.started_at, c.timezone) }} · {{ row.last_sync.status }}{% else %}Never{% endif %}
+      </td>
+      <td>
+        {% if row.last_report %}{{ row.last_report.report_date|date }} · {{ row.last_report.status }}
+          {% if row.last_report.error_text %}<br><small>{{ row.last_report.error_text }}</small>{% endif %}
+        {% else %}None{% endif %}
+      </td>
+      <td>{{ row.issue_count if row.issue_count is not none else '—' }}</td>
+      <td>{{ row.drafts }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No companies yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</figure>
+{% endblock %}

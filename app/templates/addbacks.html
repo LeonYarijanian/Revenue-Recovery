@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Add-backs{% endblock %}
+{% block content %}
+<h1>Add-backs</h1>
+<section class="value-panel" id="value-panel">
+  <p><strong>Roughly what your business would sell for today, from your own books.</strong></p>
+  <div class="figures">
+    <div><span>TTM net income{% if figures.ttm_label %} ({{ figures.ttm_label }}){% endif %}</span><strong>{{ figures.ttm_net_income }}</strong></div>
+    <div><span>Add-backs per year</span><strong>{{ figures.addbacks_total }}</strong></div>
+    <div><span>Earnings (SDE)</span><strong>{{ figures.sde }}</strong></div>
+    <div><span>Value, low ({{ figures.multiple_low }}x)</span><strong>{{ figures.value_low }}</strong></div>
+    <div><span>Value, high ({{ figures.multiple_high }}x)</span><strong>{{ figures.value_high }}</strong></div>
+  </div>
+  <p class="muted">A rough estimate from your books, not an appraisal.</p>
+</section>
+
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<table>
+  <thead><tr><th>Category</th><th>Label</th><th>Yearly amount ($)</th><th>Note</th><th></th></tr></thead>
+  <tbody>
+  {% for a in addbacks %}
+    <tr>
+      <td colspan="5">
+        <form method="post" action="/addbacks/{{ a.id }}" class="grid">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <select name="category" aria-label="Category">
+            {% for value, label in categories.items() %}<option value="{{ value }}" {% if a.category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+          <input type="text" name="label" value="{{ a.label }}" maxlength="80" aria-label="Label" required>
+          <input type="text" name="amount" value="{{ a.annual_amount_cents|plain_dollars }}" inputmode="decimal" aria-label="Yearly amount" required>
+          <input type="text" name="note" value="{{ a.note }}" maxlength="200" aria-label="Note">
+          <button type="submit" class="secondary">Save</button>
+        </form>
+        <form method="post" action="/addbacks/{{ a.id }}/delete">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit" class="secondary outline">Delete {{ a.label }}</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">No add-backs yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Add an add-back</h2>
+<form method="post" action="/addbacks" class="grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <select name="category" aria-label="Category">
+    {% for value, label in categories.items() %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+  </select>
+  <input type="text" name="label" placeholder="Label" maxlength="80" required>
+  <input type="text" name="amount" placeholder="Yearly amount, e.g. 120000" inputmode="decimal" required>
+  <input type="text" name="note" placeholder="Note (optional)" maxlength="200">
+  <button type="submit">Add</button>
+</form>
+{% endblock %}
