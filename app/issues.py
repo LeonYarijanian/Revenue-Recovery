@@ -129,3 +129,8 @@ def evaluate(k: Kpis, rules: IssueRules) -> list[Issue]:
 
 def shown(triggered: list[Issue]) -> list[Issue]:
     return triggered[:MAX_SHOWN]
+
+
+def shown_lines(triggered: list[Issue]) -> list[str]:
+    """The issue lines the report shows, or the single no-red-flags line."""
+    return [issue.line for issue in shown(triggered)] or [NO_RED_FLAGS]
