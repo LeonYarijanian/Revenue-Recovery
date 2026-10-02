@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }}{% endblock %}
+{% block content %}
+<h1>{{ company.name }}</h1>
+<p class="muted">{{ company.industry }} · {{ company.source_type }} · {{ company.timezone }}{% if not company.report_enabled %} · reports off{% endif %}</p>
+<nav class="tabs">
+  {% for t in tabs %}
+  <a href="/companies/{{ company.id }}?tab={{ t }}" {% if t == tab %}aria-current="page"{% endif %}>{{ t|capitalize }}</a>
+  {% endfor %}
+</nav>
+{% for e in errors %}<p class="error" role="alert">{{ e }}</p>{% endfor %}
+
+{% if tab == 'overview' %}
+  <p class="muted">Live figures for the report dated {{ report_date|date }}.</p>
+  <div class="figures">
+    <div><span>Revenue last week</span><strong>{{ figures.revenue_week }}</strong></div>
+    <div><span>Change vs 4-week average</span><strong>{{ figures.revenue_change_pct }}{% if figures.revenue_change_pct != 'No data' %}%{% endif %}</strong></div>
+    <div><span>Gross margin last week</span><strong>{{ figures.margin_week_pct }}{% if figures.margin_week_pct != 'No data' %}%{% endif %}</strong></div>
+    <div><span>Gross margin, 4 weeks</span><strong>{{ figures.margin_4wk_pct }}{% if figures.margin_4wk_pct != 'No data' %}%{% endif %}</strong></div>
+    <div><span>Net income last week</span><strong>{{ figures.net_income_week }}</strong></div>
+    <div><span>Cash on hand</span><strong>{{ figures.cash_on_hand }}</strong></div>
+    <div><span>Weekly burn</span><strong>{{ figures.weekly_burn }}</strong></div>
+    <div><span>Runway (weeks)</span><strong>{{ figures.runway_weeks }}</strong></div>
+    <div><span>Owed to you</span><strong>{{ figures.ar_total }}</strong></div>
+    <div><span>Over 60 days late</span><strong>{{ figures.ar_61_plus_pct }}{% if figures.ar_61_plus_pct != 'No data' %}%{% endif %}</strong></div>
+    <div><span>DSO (days)</span><strong>{{ figures.dso_days }}</strong></div>
+    <div><span>Earnings (SDE)</span><strong>{{ figures.sde }}</strong></div>
+  </div>
+  <h2>Issues</h2>
+  {% if triggered %}
+  <ol>{% for i in triggered %}<li>{{ i.line }} <small class="muted">{{ i.code }}</small></li>{% endfor %}</ol>
+  {% else %}<p>No red flags this week.</p>{% endif %}
+
+{% elif tab == 'connection' %}
+  <p>Status: <strong>{{ connection.status if connection else 'NOT_CONNECTED' }}</strong>
+    {% if connection %} · {{ connection.environment }} · realm {{ connection.realm_id }}
+      {% if connection.connected_at %} · connected {{ fmt_local(connection.connected_at, company.timezone) }}{% endif %}
+      {% if connection.last_refreshed_at %} · token refreshed {{ fmt_local(connection.last_refreshed_at, company.timezone) }}{% endif %}
+    {% endif %}
+  </p>
+  <div class="actions">
+    {% if company.source_type == 'QBO' %}
+    <a role="button" href="/qbo/connect?company_id={{ company.id }}" hx-boost="false">Connect</a>
+    {% if connection and connection.status != 'DISCONNECTED' %}
+    <form method="post" action="/qbo/disconnect">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="company_id" value="{{ company.id }}">
+      <button type="submit" class="secondary outline">Disconnect</button>
+    </form>
+    {% endif %}
+    {% endif %}
+    <form method="post" action="/companies/{{ company.id }}/sync">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="secondary">Sync now</button>
+    </form>
+  </div>
+  <h2>Sync history</h2>
+  <table>
+    <thead><tr><th>Started</th><th>Finished</th><th>Status</th><th>Weeks</th><th>Invoices</th><th>Error</th></tr></thead>
+    <tbody>
+    {% for run in sync_runs %}
+      <tr><td>{{ fmt_local(run.started_at, company.timezone) }}</td><td>{{ fmt_local(run.finished_at, company.timezone) }}</td>
+        <td>{{ run.status }}</td><td>{{ run.weeks_synced }}</td><td>{{ run.invoices_synced }}</td><td>{{ run.error_text or '' }}</td></tr>
+    {% else %}<tr><td colspan="6" class="muted">No syncs yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+{% elif tab == 'report' %}
+  <div class="actions">
+    <a role="button" class="secondary" href="/companies/{{ company.id }}/preview">Preview</a>
+  </div>
+  {% if previewing %}
+    <h2>Preview (not saved, not sent)</h2>
+    {% if preview_html %}{% with html = preview_html %}{% include "_report_frame.html" %}{% endwith %}
+    {% else %}<p class="muted">Nothing to preview: this company has no successful sync yet.</p>{% endif %}
+  {% endif %}
+  <h2>Report history</h2>
+  <table>
+    <thead><tr><th>Report date</th><th>Status</th><th>Sent</th><th>Recipients</th><th>Note</th><th></th></tr></thead>
+    <tbody>
+    {% for r in reports %}
+      <tr>
+        <td><a href="/reports/{{ r.id }}">{{ r.report_date|date }}</a></td><td>{{ r.status }}</td>
+        <td>{{ fmt_local(r.sent_at, company.timezone) }}</td><td>{{ r.recipients|join(', ') }}</td><td>{{ r.error_text or '' }}</td>
+        <td>
+          {% if r.status in ('GENERATED', 'HELD') %}
+          <form method="post" action="/companies/{{ company.id }}/reports/{{ r.id }}/send"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Send now</button></form>
+          {% elif r.status == 'SENT' %}
+          <form method="post" action="/companies/{{ company.id }}/reports/{{ r.id }}/resend"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit" class="secondary">Resend</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="muted">No reports yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+
+{% elif tab == 'settings' %}
+  {% set f = form or {} %}
+  {% macro val(name) %}{{ f[name] if name in f else settings[name] }}{% endmacro %}
+  <form method="post" action="/companies/{{ company.id }}/settings">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset>
+      <label><input type="checkbox" name="report_enabled" {% if (f.report_enabled if form else company.report_enabled) %}checked{% endif %}> report_enabled</label>
+    </fieldset>
+    <div class="grid">
+      <label>send_mode
+        <select name="send_mode">{% for m in ['DEMO', 'LIVE'] %}<option {% if val('send_mode') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
+      </label>
+      <label>report_send_time (07:00 to 10:00) <input type="text" name="report_send_time" value="{{ val('report_send_time') }}" pattern="\d\d:\d\d"></label>
+      <label>accounting_method
+        <select name="accounting_method">{% for m in ['ACCRUAL', 'CASH'] %}<option {% if val('accounting_method') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}</select>
+      </label>
+    </div>
+    <div class="grid">
+      <label>multiple_low (1.0 to 6.0) <input type="text" name="multiple_low" value="{{ val('multiple_low') }}"></label>
+      <label>multiple_high (1.0 to 8.0, at least multiple_low) <input type="text" name="multiple_high" value="{{ val('multiple_high') }}"></label>
+    </div>
+    <div class="grid">
+      <label>runway_low_weeks (1.0 to 52.0) <input type="text" name="runway_low_weeks" value="{{ val('runway_low_weeks') }}"></label>
+      <label>ar_severe_min_cents (0 to 100000000) <input type="text" name="ar_severe_min_cents" value="{{ val('ar_severe_min_cents') }}"></label>
+      <label>ar_aging_pct (5.0 to 80.0) <input type="text" name="ar_aging_pct" value="{{ val('ar_aging_pct') }}"></label>
+    </div>
+    <div class="grid">
+      <label>revenue_drop_pct (5.0 to 50.0) <input type="text" name="revenue_drop_pct" value="{{ val('revenue_drop_pct') }}"></label>
+      <label>margin_target_pct (5.0 to 90.0) <input type="text" name="margin_target_pct" value="{{ val('margin_target_pct') }}"></label>
+    </div>
+    <div class="grid">
+      <label>dso_high_days (10.0 to 180.0) <input type="text" name="dso_high_days" value="{{ val('dso_high_days') }}"></label>
+      <label>margin_drop_points (1.0 to 30.0) <input type="text" name="margin_drop_points" value="{{ val('margin_drop_points') }}"></label>
+    </div>
+    <fieldset>
+      <label><input type="checkbox" name="reminders_enabled" {% if (f.reminders_enabled if form else settings.reminders_enabled) %}checked{% endif %}> reminders_enabled (needs company_phone_e164 and reminder_reply_to)</label>
+    </fieldset>
+    <div class="grid">
+      <label>reminder_min_days_past_due (1 to 60) <input type="text" name="reminder_min_days_past_due" value="{{ val('reminder_min_days_past_due') }}"></label>
+      <label>reminder_max_per_invoice (1 to 6) <input type="text" name="reminder_max_per_invoice" value="{{ val('reminder_max_per_invoice') }}"></label>
+    </div>
+    <div class="grid">
+      <label>reminder_reply_to <input type="email" name="reminder_reply_to" value="{{ val('reminder_reply_to') }}"></label>
+      <label>company_phone_e164 <input type="text" name="company_phone_e164" value="{{ val('company_phone_e164') }}" placeholder="+18185550100"></label>
+    </div>
+    <label>payment_instructions (up to 300 characters) <textarea name="payment_instructions" maxlength="300">{{ val('payment_instructions') }}</textarea></label>
+    <button type="submit">Save settings</button>
+  </form>
+
+{% elif tab == 'recipients' %}
+  <p>Report recipients: 0 to 5 emails, one per line. LIVE needs at least 1.</p>
+  <form method="post" action="/companies/{{ company.id }}/recipients" class="narrow">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <textarea name="recipients" rows="6">{{ form.recipients if form else settings.report_recipients|join('\n') }}</textarea>
+    <button type="submit">Save recipients</button>
+  </form>
+
+{% elif tab == 'users' %}
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th>Must change password</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr><td>{{ u.full_name }}</td><td>{{ u.email }}</td><td>{{ u.role }}</td><td>{{ 'yes' if u.is_active else 'no' }}</td><td>{{ 'yes' if u.must_change_password else 'no' }}</td></tr>
+    {% else %}<tr><td colspan="5" class="muted">No users.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  <h2>Add an owner user</h2>
+  <form method="post" action="/companies/{{ company.id }}/users" class="narrow">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Name <input type="text" name="full_name" value="{{ form.full_name if form else '' }}" required></label>
+    <label>Email <input type="email" name="email" value="{{ form.email if form else '' }}" required></label>
+    <button type="submit">Add user with a temporary password</button>
+  </form>
+{% endif %}
+{% endblock %}

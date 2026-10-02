@@ -1,0 +1,35 @@
+{{ title }}
+{% if banner %}
+{{ banner }}
+{% endif %}
+{% for tile in tiles %}
+{{ tile.name }}: {{ tile.big }}
+  {{ tile.small }}
+{% endfor %}
+THIS WEEK'S TOP ISSUES
+{% if issues %}{% for issue in issues %}{{ loop.index }}. {{ issue.line }}
+   {{ issue.action }}
+{% endfor %}{% else %}{{ no_red_flags }}
+{% endif %}
+WHO OWES YOU
+{% for row in aging %}{{ row.label }}: {{ row.count }} invoices, {{ row.amount }}
+{% endfor %}Total: {{ aging_total.count }} invoices, {{ aging_total.amount }}
+
+Most overdue
+{% if top_overdue %}{% for row in top_overdue %}{{ row.customer }}, {{ row.doc_number }}: {{ row.balance }}, {{ row.days }} days past due
+{% endfor %}{% else %}No overdue invoices.
+{% endif %}
+REVENUE, LAST 8 WEEKS
+{% for row in chart %}{{ row.label }}: {{ row.amount }}
+{% endfor %}
+WHAT THE BUSINESS MIGHT SELL FOR
+{{ sde_line }}
+{{ range_line }}
+A rough estimate from your books, not an appraisal.
+{% if reminders_line %}
+REMINDERS
+{{ reminders_line }}
+{{ reminders_url }}
+{% endif %}
+--
+{{ footer }}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Home · {{ company.name }}{% endblock %}
+{% block content %}
+{% if company.source_type == 'QBO' and (not connection or connection.status != 'CONNECTED') %}
+<p class="error">
+  QuickBooks is {{ (connection.status if connection else 'NOT_CONNECTED')|replace('_', ' ')|lower }}.
+  <a href="/qbo/connect?company_id={{ company.id }}" hx-boost="false">Connect QuickBooks</a>
+</p>
+{% endif %}
+{% if latest %}
+  <p class="muted">Report for {{ latest.report_date|date }} · status {{ latest.status }}{% if latest.error_text %} · {{ latest.error_text }}{% endif %}</p>
+  {% with html = latest.html %}{% include "_report_frame.html" %}{% endwith %}
+{% else %}
+  <article>
+    <h1>No report yet</h1>
+    <p>The first report is built on Monday at 06:30 and sent at 07:00 local time, once QuickBooks data has synced.</p>
+  </article>
+{% endif %}
+<section id="reports">
+  <h2>Reports</h2>
+  {% if reports %}
+  <table>
+    <thead><tr><th>Report date</th><th>Week</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for r in reports %}
+      <tr><td><a href="/reports/{{ r.id }}">{{ r.report_date|date }}</a></td><td>{{ r.week_start|date }}</td><td>{{ r.status }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">No reports yet.</p>{% endif %}
+</section>
+{% endblock %}

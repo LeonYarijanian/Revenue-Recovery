@@ -1,0 +1,35 @@
+{
+  "QueryResponse": {
+    "Account": [
+      {
+        "Id": "35",
+        "Name": "Checking",
+        "SubAccount": false,
+        "FullyQualifiedName": "Checking",
+        "Active": true,
+        "Classification": "Asset",
+        "AccountType": "Bank",
+        "AccountSubType": "Checking",
+        "CurrentBalance": 15230.45,
+        "CurrentBalanceWithSubAccounts": 15230.45,
+        "CurrencyRef": {"value": "USD", "name": "United States Dollar"}
+      },
+      {
+        "Id": "36",
+        "Name": "Savings",
+        "SubAccount": false,
+        "FullyQualifiedName": "Savings",
+        "Active": true,
+        "Classification": "Asset",
+        "AccountType": "Bank",
+        "AccountSubType": "Savings",
+        "CurrentBalance": 4769.55,
+        "CurrentBalanceWithSubAccounts": 4769.55,
+        "CurrencyRef": {"value": "USD", "name": "United States Dollar"}
+      }
+    ],
+    "startPosition": 1,
+    "maxResults": 2
+  },
+  "time": "2026-10-12T03:00:15.456-07:00"
+}
